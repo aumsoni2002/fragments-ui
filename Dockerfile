@@ -33,20 +33,17 @@ COPY --from=dependencies /fragments-ui /fragments-ui/
 # copy our source code into our image
 COPY ./src/ /fragments-ui/src/
 
-# Stage 03: Runtime
-FROM node:20.10.0-alpine
+# build the frontend code
+RUN npm run build
 
-# set work directory
-WORKDIR /fragments-ui
+# Stage 03: Serve with nginx
+FROM nginx:alpine
 
-# copy the generated node_modules folder from our dependencies layer
-#COPY --from=dependencies /fragments-ui/node_modules ./node_modules
+# Copy built files from the build stage to nginx directory
+COPY --from=build /fragments-ui/dist /usr/share/nginx/html
 
-# copy built files from the build stage (ensure "build" script exists in package.json)
-COPY --from=build /fragments-ui .
+# Expose port 80
+EXPOSE 80
 
-# Expose port (optional, as we're hosting locally)
-# EXPOSE 80
-
-# Start the container by running the server
-CMD ["npm", "start"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

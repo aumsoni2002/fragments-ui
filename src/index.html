@@ -4,17 +4,37 @@
     <meta charset="utf-8" />
     <title>Fragments UI</title>
     <link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
+    <link rel="stylesheet" href="./style.css" />
     <script type="module" src="app.js"></script>
   </head>
   <body>
     <h1>Fragments UI</h1>
     <section>
       <nav>
-        <button id="login">Login</button> <button id="logout">Logout</button>
+        <button id="login">Login</button>
+        <button id="logout" style="display: none">Logout</button>
       </nav>
     </section>
     <section hidden id="user">
       <h2>Hello <span class="username"></span>!</h2>
+      <h3>Your Fragments:</h3>
+      <ul id="fragmentList"></ul>
+      <h3>Create New Fragment:</h3>
+      <form id="createForm">
+        <label for="fragmentType">Fragment Type:</label>
+        <select id="fragmentType">
+          <option value="text/plain">Text</option>
+          <option value="application/json">JSON</option>
+          <option value="text/markdown">Markdown (md)</option>
+          <!-- Added markdown option -->
+        </select>
+        <br />
+        <br />
+        <label for="fragmentContent">Fragment Content:</label>
+        <textarea id="fragmentContent"></textarea>
+        <br />
+        <button type="submit">Create Fragment</button>
+      </form>
     </section>
   </body>
 </html>

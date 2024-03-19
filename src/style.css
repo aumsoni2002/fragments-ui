@@ -1,0 +1,43 @@
+/* style.css */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+nav button {
+    margin-right: 10px;
+}
+
+#fragmentList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#fragmentList li {
+    margin-bottom: 5px;
+}
+
+/* Add spacing between fragments and style them */
+#fragmentList li {
+    margin-bottom: 10px;
+    /* Add spacing between list items */
+    padding: 10px;
+    /* Add padding to create some space around the content */
+    border: 1px solid #ccc;
+    /* Add border for better visual separation */
+    border-radius: 5px;
+    /* Add border radius for rounded corners */
+    /* background-color: #f9f9f9; */
+    /* Add background color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Add box shadow for a subtle lift effect */
+}
+
+#fragmentList li:hover {
+    /* background-color: #f0f0f0; */
+    /* Change background color on hover for interactivity */
+}

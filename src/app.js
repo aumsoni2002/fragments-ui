@@ -1,52 +1,79 @@
 // src/app.js
 
-import { Auth, getUser } from './auth';
-
-import { getUserFragments } from './api';
+import { Auth, getUser } from "./auth";
+import { fetchUserFragments, createNewFragment } from "./api";
 
 async function init() {
-  // Get our UI elements
-  const userSection = document.querySelector('#user');
-  const loginBtn = document.querySelector('#login');
-  const logoutBtn = document.querySelector('#logout');
+  const userSection = document.querySelector("#user");
+  const loginBtn = document.querySelector("#login");
+  const logoutBtn = document.querySelector("#logout");
 
-  // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
-    // Sign-in via the Amazon Cognito Hosted UI (requires redirects), see:
-    // https://docs.amplify.aws/lib/auth/advanced/q/platform/js/#identity-pool-federation
     Auth.federatedSignIn();
   };
+
   logoutBtn.onclick = () => {
-    // Sign-out of the Amazon Cognito Hosted UI (requires redirects), see:
-    // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-out
     Auth.signOut();
   };
 
-  // See if we're signed in (i.e., we'll have a `user` object)
   const user = await getUser();
   if (!user) {
-    // Disable the Logout button
-    logoutBtn.disabled = true;
+    logoutBtn.style.display = "none"; // Hide logout button if user is not logged in
     return;
   }
 
-  // Log the user info for debugging purposes
-  console.log({ user });
+  // Log user details
+  console.log("User details:", user);
 
-  // Update the UI to welcome the user
   userSection.hidden = false;
+  userSection.querySelector(".username").innerText = user.username;
+  loginBtn.style.display = "none"; // Hide login button if user is logged in
+  logoutBtn.style.display = "block"; // Show logout button
 
-  // Show the user's username
-  userSection.querySelector('.username').innerText = user.username;
+  const fragmentList = document.getElementById("fragmentList");
 
-  // Disable the Login button
-  loginBtn.disabled = true;
+  // Function to display fragments
+  async function displayFragments(user) {
+    fragmentList.innerHTML = ""; // Clear existing fragment list
+    const res = await fetchUserFragments(user);
+    if (res.fragments && res.fragments.length > 0) {
+      res.fragments.forEach((fragment) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<div>ID: ${fragment.id}</div>
+                     <div>Type: ${fragment.type}</div>
+                     <div>Created: ${new Date(
+                       fragment.created
+                     ).toLocaleString()}</div>
+                     <div>Updated: ${new Date(
+                       fragment.updated
+                     ).toLocaleString()}</div>
+                     <div>Size: ${fragment.size}</div>
+                     <div>Owner ID: ${fragment.ownerId}</div>`;
+        fragmentList.appendChild(li);
+      });
+    } else {
+      fragmentList.innerHTML = "<li>No fragments found.</li>";
+    }
+  }
 
-  // Do an authenticated request to the fragments API server and log the result
-  const userFragments = await getUserFragments(user);
+  await displayFragments(user); // Display user's fragments on page load
 
-  // TODO: later in the course, we will show all the user's fragments in the HTML...
+  const createForm = document.getElementById("createForm");
+  createForm.addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent form submission
+    const fragmentType = document.getElementById("fragmentType").value;
+    const fragmentContent = document.getElementById("fragmentContent").value;
+    try {
+      await createNewFragment(user, fragmentContent, fragmentType); // Create new fragment
+      await displayFragments(user); // Refresh fragment list
+      // Clear the form fields
+      document.getElementById("fragmentType").value = "text/plain";
+      document.getElementById("fragmentContent").value = "";
+    } catch (error) {
+      console.error("Failed to create fragment:", error);
+      alert("Failed to create fragment. Please try again.");
+    }
+  });
 }
 
-// Wait for the DOM to be ready, then start the app
-addEventListener('DOMContentLoaded', init);
+addEventListener("DOMContentLoaded", init);

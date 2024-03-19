@@ -1,29 +1,68 @@
 // src/api.js
 
-// fragments microservice API to use, defaults to localhost:8080 if not set in env
+// fragments microservice API, defaults to localhost:8080
 const apiUrl = process.env.API_URL || "http://localhost:8080";
 
 /**
- * Given an authenticated user, request all fragments for this user from the
- * fragments microservice (currently only running locally). We expect a user
- * to have an `idToken` attached, so we can send that along with the request.
+ * Retrieve list of fragments for the user
  */
-export async function getUserFragments(user) {
-  console.log("Requesting user fragments data...");
+export async function fetchUserFragments(user) {
+  console.log("Fetching user fragments...");
+
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments`, {
-      // Generate headers with the proper Authorization bearer token to pass.
-      // We are using the `authorizationHeaders()` helper method we defined
-      // earlier, to automatically attach the user's ID token.
+    const response = await fetch(`${apiUrl}/v1/fragments?expand=1`, {
+      method: "GET",
       headers: user.authorizationHeaders(),
     });
-    if (!res.ok) {
-      throw new Error(`${res.status} ${res.statusText}`);
+
+    if (!response.ok) {
+      throw new Error("Failed to retrieve fragments.");
     }
-    const data = await res.json();
-    console.log("Successfully got user fragments data", { data });
-    return data;
-  } catch (err) {
-    console.error("Unable to call GET /v1/fragment", { err });
+
+    const responseData = await response.json();
+
+    if (responseData.fragments.length > 0) {
+      console.log(
+        `Successfully retrieved ${responseData.fragments.length} fragment(s):`,
+        { responseData }
+      );
+    } else {
+      console.log("No fragments found for the user.");
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error("Error fetching user fragments:", error.message);
+    throw error;
+  }
+}
+
+/**
+ * Create a new fragment
+ */
+export async function createNewFragment(user, fragmentContent, contentType) {
+  console.log("Creating a new fragment...");
+
+  try {
+    const response = await fetch(`${apiUrl}/v1/fragments`, {
+      method: "POST",
+      headers: {
+        Authorization: user.authorizationHeaders().Authorization,
+        "Content-Type": contentType,
+      },
+      body: fragmentContent,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create a new fragment.");
+    }
+
+    const responseData = await response.json();
+    console.log("Successfully created new fragment:", responseData);
+
+    return responseData;
+  } catch (error) {
+    console.error("Error creating new fragment:", error.message);
+    throw error;
   }
 }
