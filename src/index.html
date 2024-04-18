@@ -26,15 +26,64 @@
           <option value="text/plain">Text</option>
           <option value="application/json">JSON</option>
           <option value="text/markdown">Markdown (md)</option>
-          <!-- Added markdown option -->
+          <option value="image/png">Image (PNG)</option>
+          <option value="image/jpeg">Image (JPEG)</option>
+          <option value="image/webp">Image (WebP)</option>
+          <option value="image/gif">Image (GIF)</option>
         </select>
         <br />
         <br />
         <label for="fragmentContent">Fragment Content:</label>
-        <textarea id="fragmentContent"></textarea>
+        <textarea
+          id="fragmentContent"
+          placeholder="Insert your fragment data here..."
+        ></textarea>
+        <br>
+        <input type="file" id="imageFragment" accept="image/*" />
         <br />
         <button type="submit">Create Fragment</button>
       </form>
     </section>
+
+    <!-- Modal for viewing fragment -->
+    <div id="viewModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>View Fragment</h2>
+        <label for="extensionInput">File Extension:</label>
+        <input
+          type="text"
+          id="extensionInput"
+          placeholder="Enter file extension (e.g., jpg)"
+        />
+        <button id="convertBtn">Convert</button>
+        <pre id="viewFragmentContent"></pre>
+      </div>
+    </div>
+
+    <!-- Modal for updating fragment -->
+    <div id="updateModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Update Fragment</h2>
+        <form id="updateForm">
+          <label for="updateFragmentContent">Fragment Content:</label>
+          <textarea id="updateFragmentContent"></textarea>
+          <input type="file" id="updateImageFragment" accept="image/*" hidden/>
+          <br />
+          <button type="submit">Update Fragment</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for deleting fragment -->
+    <div id="deleteModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Delete Fragment</h2>
+        <p>Are you sure you want to delete this fragment?</p>
+        <button id="confirmDelete">Delete</button>
+      </div>
+    </div>
   </body>
 </html>
